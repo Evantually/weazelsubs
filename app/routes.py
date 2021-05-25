@@ -8,7 +8,7 @@ from flask import render_template, url_for, flash, redirect, jsonify
 def index():
     form = SearchIDForm()
     if form.validate_on_submit():
-        if form.name.data != '':
+        if form.name.data is not None:
             subs = Subscription.query.filter(Subscription.name.contains(form.name.data))
             if subs is None:
                 flash('There are no subscriptions with this name. Please create a new subscription.')

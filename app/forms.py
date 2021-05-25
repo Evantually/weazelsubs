@@ -21,3 +21,12 @@ class RenewSubscriptionForm(FlaskForm):
 class ResetAllSubscriptionsForm(FlaskForm):
     reset = StringField('Please type "Reset" into this box to reset all subscriptions.')
     submit = SubmitField('Submit')
+
+
+class DeleteSubscriptionForm(FlaskForm):
+    delete = StringField('Please type "Delete" into this box to delete the subscription.')
+    submit = SubmitField('Submit')
+
+class DeleteAllForm(FlaskForm):
+    delete = StringField('Please type the password into this box to delete all data.')
+    submit = SubmitField('Submit')

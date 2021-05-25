@@ -1,6 +1,7 @@
 from app import app, db
 from app.models import Subscription, SubChange
-from app.forms import SearchIDForm, AddSubscriptionForm, RenewSubscriptionForm, ResetAllSubscriptionsForm
+from app.forms import SearchIDForm, AddSubscriptionForm, RenewSubscriptionForm, ResetAllSubscriptionsForm, DeleteSubscriptionForm, DeleteAllForm
+from config import Config
 from datetime import datetime
 from flask import render_template, url_for, flash, redirect, jsonify
 
@@ -87,3 +88,35 @@ def reset_subscriptions():
 def changelog():
     changes = SubChange.query.all()
     return render_template('changes.html', changes=changes)
+
+@app.route('/delete_subscription/<sub_id>', methods=['GET', 'POST'])
+def delete_subscription(sub_id):
+    form = DeleteSubscriptionForm()
+    sub = Subscription.query.filter_by(sub_id=sub_id).first()
+    if form.validate_on_submit():
+        if form.delete.data == 'Delete':
+            change = SubChange(sub_id=sub.id, prev_name=sub.name, new_name='', 
+                                prev_status=sub.active_status, new_status=False,
+                                prev_sub_id=sub.sub_id, new_sub_id='')
+            db.session.add(change)
+            db.session.delete(sub)
+            db.session.commit()
+            flash(f'Subscription successfully deleted for {sub.name}.')
+            return redirect(url_for('index'))
+    return render_template('delete_subscription.html', form=form, sub=sub, title="Delete Subscription")
+
+@app.route('/delete_all', methods=['GET', 'POST'])
+def delete_all():
+    form = DeleteAllForm()
+    if form.validate_on_submit():
+        if form.delete.data == Config.SECRET_KEY:
+            subs = Subscription.query.all()
+            for sub in subs:
+                db.session.delete(sub)
+            changes = SubChange.query.all()
+            for change in changes:
+                db.session.delete(change)
+            db.session.commit()
+            flash('All entries in all databases have been cleared.')
+            return redirect(url_for('index'))
+    return render_template('delete_all.html', form=form, title="Delete All Data")

@@ -1,5 +1,5 @@
 from app import app, db
-from app.models import Subscription
+from app.models import Subscription, SubChange
 from app.forms import SearchIDForm, AddSubscriptionForm, RenewSubscriptionForm, ResetAllSubscriptionsForm
 from datetime import datetime
 from flask import render_template, url_for, flash, redirect, jsonify
@@ -28,6 +28,10 @@ def add_subscription():
     if form.validate_on_submit():
         subscription = Subscription(sub_id=form.sub_id.data, name=form.name.data, active_status=True)
         db.session.add(subscription)
+        subChange = SubChange(sub_id=subscription.id, prev_name=subscription.name, new_name=subscription.name,
+                                prev_status=subscription.active_status, new_status=subscription.active_status,
+                                prev_sub_id=subscription.sub_id, new_sub_id=subscription.sub_id)
+        db.session.add(subChange)
         db.session.commit()
         flash('Subscription added successfully.')
         return redirect(url_for('subscription_info', sub_id=subscription.sub_id))
@@ -38,7 +42,11 @@ def renew_subscription(id):
     form = RenewSubscriptionForm()
     sub = Subscription.query.filter_by(id=id).first()
     if form.validate_on_submit():
+        change = SubChange(sub_id=sub.id, prev_name=sub.name, new_name=sub.name,
+                                prev_status=sub.active_status, new_status=form.active_status.data,
+                                prev_sub_id=sub.sub_id, new_sub_id=sub.sub_id)
         sub.active_status = form.active_status.data
+        db.session.add(change)
         db.session.commit()
         flash(f'Subscription for {sub.name} has been updated!')
         return redirect(url_for('subscription_info', sub_id=sub.sub_id))
@@ -61,7 +69,12 @@ def reset_subscriptions():
         if form.reset.data == 'Reset':
             subs = Subscription.query.all()
             for sub in subs:
-                sub.active_status = False
+                if sub.active_status == True:
+                    subChange = SubChange(sub_id=sub.id, prev_name=sub.name, new_name=sub.name,
+                                prev_status=True, new_status=False,
+                                prev_sub_id=sub.sub_id, new_sub_id=sub.sub_id)
+                    sub.active_status = False
+                    db.session.add(subChange)
             db.session.commit()
             flash('All subscriptions have been reset.')
             return redirect(url_for('index'))
@@ -69,3 +82,8 @@ def reset_subscriptions():
             flash('The spelling may be off for "Reset"')
             return redirect(url_for('reset_subscriptions'))
     return render_template('renew_subscription.html', form=form, title="Reset Subscriptions")
+
+@app.route('/changelog')
+def changelog():
+    changes = SubChange.query.all()
+    return render_template('changes.html', changes=changes)

@@ -9,3 +9,14 @@ class Subscription(db.Model):
 
     def __repr__(self):
         return '{}'.format(self.name)
+
+class SubChange(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    time_of_change = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+    sub_id = db.Column(db.Integer, db.ForeignKey('subscription.id'))
+    prev_name = db.Column(db.String(128), nullable=False)
+    new_name = db.Column(db.String(128), nullable=False)
+    prev_status = db.Column(db.Boolean, nullable=False)
+    new_status = db.Column(db.Boolean, nullable=False)
+    prev_sub_id = db.Column(db.String(12), nullable=False)
+    new_sub_id = db.Column(db.String(12), nullable=False)

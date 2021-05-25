@@ -1,0 +1,71 @@
+from app import app, db
+from app.models import Subscription
+from app.forms import SearchIDForm, AddSubscriptionForm, RenewSubscriptionForm, ResetAllSubscriptionsForm
+from datetime import datetime
+from flask import render_template, url_for, flash, redirect, jsonify
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    form = SearchIDForm()
+    if form.validate_on_submit():
+        if form.name.data != '':
+            subs = Subscription.query.filter(Subscription.name.contains(form.name.data))
+            if subs is None:
+                flash('There are no subscriptions with this name. Please create a new subscription.')
+                return redirect(url_for('add_subscription'))
+            return render_template('subscriptions.html', subs=subs)
+        else:    
+            sub = Subscription.query.filter_by(sub_id=form.sub_id.data).first()
+        if sub is None:
+            flash('There is no subscription with this id. Please create a new subscription.')
+            return redirect(url_for('add_subscription'))
+        return redirect(url_for('subscription_info', sub_id=sub.sub_id))
+    return render_template('index.html', form=form)
+
+@app.route('/add_subscription', methods=['GET', 'POST'])
+def add_subscription():
+    form = AddSubscriptionForm()
+    if form.validate_on_submit():
+        subscription = Subscription(sub_id=form.sub_id.data, name=form.name.data, active_status=True)
+        db.session.add(subscription)
+        db.session.commit()
+        flash('Subscription added successfully.')
+        return redirect(url_for('subscription_info', sub_id=subscription.sub_id))
+    return render_template('add_subscription.html', form=form)
+
+@app.route('/renew_subscription/<id>', methods=['GET', 'POST'])
+def renew_subscription(id):
+    form = RenewSubscriptionForm()
+    sub = Subscription.query.filter_by(id=id).first()
+    if form.validate_on_submit():
+        sub.active_status = form.active_status.data
+        db.session.commit()
+        flash(f'Subscription for {sub.name} has been updated!')
+        return redirect(url_for('subscription_info', sub_id=sub.sub_id))
+    return render_template('renew_subscription.html', form=form, title="Renew a subscription")
+
+@app.route('/subscription_info/<sub_id>')
+def subscription_info(sub_id):
+    sub = Subscription.query.filter_by(sub_id=sub_id).first()
+    return render_template('subscription_info.html', sub=sub)
+
+@app.route('/subscriptions')
+def subscriptions():
+    subs = Subscription.query.all()
+    return render_template('subscriptions.html', subs=subs)
+
+@app.route('/reset_subscriptions', methods=['GET', 'POST'])
+def reset_subscriptions():
+    form = ResetAllSubscriptionsForm()
+    if form.validate_on_submit():
+        if form.reset.data == 'Reset':
+            subs = Subscription.query.all()
+            for sub in subs:
+                sub.active_status = False
+            db.session.commit()
+            flash('All subscriptions have been reset.')
+            return redirect(url_for('index'))
+        else:
+            flash('The spelling may be off for "Reset"')
+            return redirect(url_for('reset_subscriptions'))
+    return render_template('renew_subscription.html', form=form, title="Reset Subscriptions")

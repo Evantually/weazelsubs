@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Weazel Subscription Info</h1>
+    <div class="row">
+        <div class="col-md-4">
+            Name: <b>{{ sub.name }}</b>
+        </div>
+        <div class="col-md-4">
+            Serial Number: <b>{{ sub.sub_id }}</b>
+        </div>
+        <div class="col-md-4">
+            Subscription Status: 
+            {% if sub.active_status == True %} 
+                <span style="background-color: green; font-weight: bold;">Active</span>
+            {% else %}
+                <span style="background-color: red; font-weight: bold;">Inactive</span>
+            {% endif %}
+        </div>
+    </div>
+    <a href="{{ url_for('renew_subscription', id=sub.id) }}">Renew Subscription</a>
+{% endblock %}

@@ -9,7 +9,7 @@ def index():
     form = SearchIDForm()
     if form.validate_on_submit():
         if form.name.data is not None:
-            subs = Subscription.query.filter(Subscription.name.contains(form.name.data))
+            subs = Subscription.query.filter(Subscription.name.ilike(f'%{form.name.data}%'))
             if subs is None:
                 flash('There are no subscriptions with this name. Please create a new subscription.')
                 return redirect(url_for('add_subscription'))

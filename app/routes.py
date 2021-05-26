@@ -110,12 +110,12 @@ def delete_all():
     form = DeleteAllForm()
     if form.validate_on_submit():
         if form.delete.data == Config.SECRET_KEY:
-            subs = Subscription.query.all()
-            for sub in subs:
-                db.session.delete(sub)
             changes = SubChange.query.all()
             for change in changes:
                 db.session.delete(change)
+            subs = Subscription.query.all()
+            for sub in subs:
+                db.session.delete(sub)
             db.session.commit()
             flash('All entries in all databases have been cleared.')
             return redirect(url_for('index'))

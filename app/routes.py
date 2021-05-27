@@ -27,11 +27,12 @@ def index():
 def add_subscription():
     form = AddSubscriptionForm()
     if form.validate_on_submit():
-        subscription = Subscription(sub_id=form.sub_id.data, name=form.name.data, active_status=True)
+        subscription = Subscription(sub_id=form.sub_id.data, name=form.name.data, active_status=True, email_id=form.email_id.data)
         db.session.add(subscription)
         subChange = SubChange(sub_id=subscription.id, prev_name=subscription.name, new_name=subscription.name,
                                 prev_status=subscription.active_status, new_status=subscription.active_status,
-                                prev_sub_id=subscription.sub_id, new_sub_id=subscription.sub_id)
+                                prev_sub_id=subscription.sub_id, new_sub_id=subscription.sub_id,
+                                prev_email_id=subscription.email_id, new_email_id=subscription.email_id)
         db.session.add(subChange)
         db.session.commit()
         flash('Subscription added successfully.')
@@ -45,7 +46,8 @@ def renew_subscription(id):
     if form.validate_on_submit():
         change = SubChange(sub_id=sub.id, prev_name=sub.name, new_name=sub.name,
                                 prev_status=sub.active_status, new_status=form.active_status.data,
-                                prev_sub_id=sub.sub_id, new_sub_id=sub.sub_id)
+                                prev_sub_id=sub.sub_id, new_sub_id=sub.sub_id,
+                                prev_email_id=sub.email_id, new_email_id=sub.email_id)
         sub.active_status = form.active_status.data
         db.session.add(change)
         db.session.commit()
@@ -73,7 +75,8 @@ def reset_subscriptions():
                 if sub.active_status == True:
                     subChange = SubChange(sub_id=sub.id, prev_name=sub.name, new_name=sub.name,
                                 prev_status=True, new_status=False,
-                                prev_sub_id=sub.sub_id, new_sub_id=sub.sub_id)
+                                prev_sub_id=sub.sub_id, new_sub_id=sub.sub_id,
+                                prev_email_id=sub.email_id, new_email_id=sub.email_id)
                     sub.active_status = False
                     db.session.add(subChange)
             db.session.commit()
@@ -97,7 +100,8 @@ def delete_subscription(sub_id):
         if form.delete.data == 'Delete':
             change = SubChange(sub_id=sub.id, prev_name=sub.name, new_name='', 
                                 prev_status=sub.active_status, new_status=False,
-                                prev_sub_id=sub.sub_id, new_sub_id='')
+                                prev_sub_id=sub.sub_id, new_sub_id='',
+                                prev_email_id=sub.email_id, new_email_id='')
             db.session.add(change)
             db.session.delete(sub)
             db.session.commit()

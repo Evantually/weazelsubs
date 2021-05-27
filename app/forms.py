@@ -5,13 +5,14 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired
 
 class SearchIDForm(FlaskForm):
-    sub_id = StringField('Subscription ID')
+    sub_id = StringField('Document ID')
     name = StringField('Name')
     submit = SubmitField('Submit')
 
 class AddSubscriptionForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    sub_id = StringField('Subscription ID', validators=[DataRequired()])
+    sub_id = StringField('Document ID', validators=[DataRequired()])
+    email_id = StringField('Discord ID', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 class RenewSubscriptionForm(FlaskForm):

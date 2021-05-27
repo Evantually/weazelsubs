@@ -2,18 +2,8 @@ from app import app, db
 from app.models import Subscription, SubChange
 from app.forms import SearchIDForm, AddSubscriptionForm, RenewSubscriptionForm, ResetAllSubscriptionsForm, DeleteSubscriptionForm, DeleteAllForm
 from config import Config
-import discord
 from datetime import datetime
 from flask import render_template, url_for, flash, redirect, jsonify
-
-client = discord.Client()
-
-# @client.event
-# async def on_ready():
-#     client.run(DISCORD_BOT_TOKEN)
-
-#     for guild in client.guilds:
-#         for member in guild.members:
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -107,13 +97,11 @@ def changelog():
 def delete_subscription(sub_id):
     form = DeleteSubscriptionForm()
     sub = Subscription.query.filter_by(sub_id=sub_id).first()
+    changes = SubChange.query.filter_by(sub_id=sub.id).all()
     if form.validate_on_submit():
         if form.delete.data == 'Delete':
-            change = SubChange(sub_id=sub.id, prev_name=sub.name, new_name='', 
-                                prev_status=sub.active_status, new_status=False,
-                                prev_sub_id=sub.sub_id, new_sub_id='',
-                                prev_email_id=sub.email_id, new_email_id='')
-            db.session.add(change)
+            for change in changes:
+                db.session.delete(change)
             db.session.delete(sub)
             db.session.commit()
             flash(f'Subscription successfully deleted for {sub.name}.')

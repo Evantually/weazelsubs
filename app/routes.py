@@ -2,8 +2,19 @@ from app import app, db
 from app.models import Subscription, SubChange
 from app.forms import SearchIDForm, AddSubscriptionForm, RenewSubscriptionForm, ResetAllSubscriptionsForm, DeleteSubscriptionForm, DeleteAllForm
 from config import Config
+import discord
 from datetime import datetime
 from flask import render_template, url_for, flash, redirect, jsonify
+
+client = discord.Client()
+
+# @client.event
+# async def on_ready():
+#     client.run(DISCORD_BOT_TOKEN)
+
+#     for guild in client.guilds:
+#         for member in guild.members:
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -124,3 +135,11 @@ def delete_all():
             flash('All entries in all databases have been cleared.')
             return redirect(url_for('index'))
     return render_template('delete_all.html', form=form, title="Delete All Data")
+
+@app.route('/discord_roles')
+def discord_roles():
+    subs = Subscription.query.filter_by(active_status=True).all()
+    active_subs = []
+    for sub in subs:
+        active_subs.append(sub.email_id)
+    return jsonify(active_subs)

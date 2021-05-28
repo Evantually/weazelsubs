@@ -42,8 +42,10 @@ def add_subscription():
 
 @app.route('/renew_subscription/<id>', methods=['GET', 'POST'])
 def renew_subscription(id):
-    form = RenewSubscriptionForm()
     sub = Subscription.query.filter_by(id=id).first()
+    form = RenewSubscriptionForm(name=sub.name, active_status=sub.active_status,
+                                    email_id=sub.email_id, paid_sub=sub.paid_sub,
+                                    sub_id=sub.sub_id)
     if form.validate_on_submit():
         change = SubChange(sub_id=sub.id, prev_name=sub.name, new_name=form.name.data,
                                 prev_status=sub.active_status, new_status=form.active_status.data,

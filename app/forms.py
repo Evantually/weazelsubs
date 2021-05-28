@@ -16,6 +16,9 @@ class AddSubscriptionForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class RenewSubscriptionForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    sub_id = StringField('Document ID', validators=[DataRequired()])
+    email_id = StringField('Discord ID', validators=[DataRequired()])
     active_status = BooleanField('Active Status')
     submit = SubmitField('Submit')
 

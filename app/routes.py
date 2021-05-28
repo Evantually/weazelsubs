@@ -45,11 +45,14 @@ def renew_subscription(id):
     form = RenewSubscriptionForm()
     sub = Subscription.query.filter_by(id=id).first()
     if form.validate_on_submit():
-        change = SubChange(sub_id=sub.id, prev_name=sub.name, new_name=sub.name,
+        change = SubChange(sub_id=sub.id, prev_name=sub.name, new_name=form.name.data,
                                 prev_status=sub.active_status, new_status=form.active_status.data,
-                                prev_sub_id=sub.sub_id, new_sub_id=sub.sub_id,
-                                prev_email_id=sub.email_id, new_email_id=sub.email_id)
+                                prev_sub_id=sub.sub_id, new_sub_id=form.sub_id.data,
+                                prev_email_id=sub.email_id, new_email_id=form.email_id.data)
         sub.active_status = form.active_status.data
+        sub.name = form.name.data
+        sub.email_id = form.email_id.data
+        sub.sub_id = form.sub_id.data
         db.session.add(change)
         db.session.commit()
         flash(f'Subscription for {sub.name} has been updated!')

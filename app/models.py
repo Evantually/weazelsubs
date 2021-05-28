@@ -7,6 +7,7 @@ class Subscription(db.Model):
     name = db.Column(db.String(128), nullable=False)
     email_id = db.Column(db.String(128))
     active_status = db.Column(db.Boolean, nullable=False)
+    paid_sub = db.Column(db.Boolean)
 
     def __repr__(self):
         return '{}'.format(self.name)

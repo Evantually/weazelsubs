@@ -28,7 +28,7 @@ def index():
 def add_subscription():
     form = AddSubscriptionForm()
     if form.validate_on_submit():
-        subscription = Subscription(sub_id=form.sub_id.data, name=form.name.data, active_status=True, email_id=form.email_id.data)
+        subscription = Subscription(sub_id=form.sub_id.data, name=form.name.data, active_status=True, email_id=form.email_id.data, paid_sub=form.paid_sub.data)
         db.session.add(subscription)
         subChange = SubChange(sub_id=subscription.id, prev_name=subscription.name, new_name=subscription.name,
                                 prev_status=subscription.active_status, new_status=subscription.active_status,
@@ -53,6 +53,7 @@ def renew_subscription(id):
         sub.name = form.name.data
         sub.email_id = form.email_id.data
         sub.sub_id = form.sub_id.data
+        sub.paid_sub = form.paid_sub.data
         db.session.add(change)
         db.session.commit()
         flash(f'Subscription for {sub.name} has been updated!')

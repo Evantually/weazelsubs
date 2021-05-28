@@ -13,6 +13,7 @@ class AddSubscriptionForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     sub_id = StringField('Document ID', validators=[DataRequired()])
     email_id = StringField('Discord ID', validators=[DataRequired()])
+    paid_sub = BooleanField('Paid Subscription')
     submit = SubmitField('Submit')
 
 class RenewSubscriptionForm(FlaskForm):
@@ -20,6 +21,7 @@ class RenewSubscriptionForm(FlaskForm):
     sub_id = StringField('Document ID', validators=[DataRequired()])
     email_id = StringField('Discord ID', validators=[DataRequired()])
     active_status = BooleanField('Active Status')
+    paid_sub = BooleanField('Paid Subscription')
     submit = SubmitField('Submit')
 
 class ResetAllSubscriptionsForm(FlaskForm):

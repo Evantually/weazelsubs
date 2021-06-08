@@ -24,3 +24,15 @@ class SubChange(db.Model):
     new_sub_id = db.Column(db.String(12), nullable=False)
     prev_email_id = db.Column(db.String(128))
     new_email_id = db.Column(db.String(128))
+
+class CardEntry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128))
+    card = db.Column(db.Integer, db.ForeignKey('card.id'))
+    time_received = db.Column(db.DateTime, default=datetime.utcnow())
+
+class Card(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128))
+    quality = db.Column(db.String(128))
+    image = db.Column(db.String(128))

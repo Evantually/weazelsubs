@@ -9,6 +9,7 @@ from flask import render_template, url_for, flash, redirect, jsonify
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = SearchIDForm()
+    active_subs = len(Subscription.query.filter_by(paid_sub=True).all())
     if form.validate_on_submit():
         if form.name.data is not None:
             subs = Subscription.query.filter(Subscription.name.ilike(f'%{form.name.data}%'))
@@ -22,7 +23,7 @@ def index():
             flash('There is no subscription with this id. Please create a new subscription.')
             return redirect(url_for('add_subscription'))
         return redirect(url_for('subscription_info', sub_id=sub.sub_id))
-    return render_template('index.html', form=form)
+    return render_template('index.html', form=form, active_subs=active_subs)
 
 @app.route('/add_subscription', methods=['GET', 'POST'])
 def add_subscription():
@@ -137,3 +138,7 @@ def discord_roles():
     for sub in subs:
         active_subs.append(sub.email_id)
     return jsonify(active_subs)
+
+@app.route('/cardentry/<first_name>/<last_name>', methods=['POST'])
+def card_entry(first_name, last_name):
+    pass

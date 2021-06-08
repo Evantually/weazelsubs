@@ -57,6 +57,7 @@ def renew_subscription(id):
         sub.email_id = form.email_id.data
         sub.sub_id = form.sub_id.data
         sub.paid_sub = form.paid_sub.data
+        sub.last_changed = datetime.utcnow()
         db.session.add(change)
         db.session.commit()
         flash(f'Subscription for {sub.name} has been updated!')
@@ -70,7 +71,7 @@ def subscription_info(sub_id):
 
 @app.route('/subscriptions')
 def subscriptions():
-    subs = Subscription.query.all()
+    subs = Subscription.query.order_by(Subscription.last_changed.desc()).all()
     return render_template('subscriptions.html', subs=subs)
 
 @app.route('/reset_subscriptions', methods=['GET', 'POST'])

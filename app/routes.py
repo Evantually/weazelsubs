@@ -9,7 +9,7 @@ from flask import render_template, url_for, flash, redirect, jsonify
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = SearchIDForm()
-    active_subs = len(Subscription.query.filter_by(paid_sub=True).all())
+    active_subs = len(Subscription.query.filter_by(paid_sub=True, active_status=True).all())
     if form.validate_on_submit():
         if form.name.data is not None:
             subs = Subscription.query.filter(Subscription.name.ilike(f'%{form.name.data}%'))
